@@ -1,0 +1,59 @@
+---
+title: "Bulletin Covid"
+author: "V. Tolon & V. Payet"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+jj<-30
+pays<-"France"
+```
+
+## R Markdown
+
+Nous utilisons ici des données publiques (accès et utilisation libre) et de taille suffisamment restreintes pour être contenues dans un seul fichier de type *.txt* ou *.csv*. Vous pouvez trouver ces données avec un moteur de recherche classique ou sur des sites spécialisés dans la mise à disposition de données publiques. 
+
+-  Vous pourrez par exemple aller sur [https://www.data.gouv.fr/fr/](https://www.data.gouv.fr/fr/) puis faire une recherche avec *covid pays monde évolution*. Ouvrez le lien présentant l'évolution de la pandémie du Covid19 dans le monde sur les 30 derniers jours, allez en bas de la page pour cliquer sur le lien *Evolution par jour et par pays (CSV)*, copier l'adresse de l'URL et utilisez la dans l'import : 
+
+
+```{r covid,echo=T, eval=T,collapse=F}
+covid<-read.csv2("https://www.data.gouv.fr/fr/datasets/r/f4935ed4-7a88-44e4-8f8a-33910a151d42" , 
+                 header=TRUE, dec=".", sep=";", 
+                 skip=7, encoding = "UTF-8")
+# Attention nous ne lisons pas les 3 première lignes grâce à skip=3
+# Il s'agissait de 3 lignes de présentation des données
+# Nous spécifions aussi l'encodage en UTF-8 (gestion des accents)
+dim(covid)
+covid[1:4, 1:5]
+covid$Date<-as.POSIXct(covid$Date,format="%Y-%m-%d")
+```
+
+# En `r pays`
+
+## Nb Cas
+```{r covid2,echo=F, eval=T,collapse=F}
+covidF<-covid[covid$Pays==pays,]
+covidF<-covidF[order(covidF$Date),]
+Dates <- covidF$Date[-1]
+Jours <- 1:length(Dates)
+Cases <- diff(covidF$Infections)
+plot(Dates,Cases,type="b")
+lines(Dates,predict(loess(Cases~Jours)),pch=16,cex=0.5,col="red")
+nn<-nrow(covidF)
+```
+
+
+
+## Evolution sur `r jj` jours.
+```{r covid3,echo=F, eval=T,collapse=F}
+covidFB<-covidF[(nn-jj):nn,]
+CasesB <- diff(covidFB$Infections)
+n1<-CasesB[2:jj]
+n0<-CasesB[-length(CasesB)]
+taux <- median((n1-n0)/(n0+1))
+if (taux>0.01) {evol="augmente"} else if (taux < (-0.01)) {evol="diminue"} else {evol="reste stable"}
+```
+
+Le nombre de cas de COVID19 en `r pays` sur `r jj` jours `r evol` avec un taux d'évolution journalier de `r round(taux*100,1)`%.
