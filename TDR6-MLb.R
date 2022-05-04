@@ -1,6 +1,6 @@
 # TDR6 - JEU DE DONNEES Iris
 
-## Import des données
+# Import des données
 iris1 <- read.table("DesIris.txt", header = TRUE, dec = ".", sep = " ", stringsAsFactors = TRUE)
 iris1
 
@@ -68,7 +68,7 @@ names(iris1)
 iris2 <- data.frame(iris1, Rapport)
 head(iris2)
 
-# quelle est l’espèce pour laquelle les pétales ont la forme la plus étroite ?
+# quelle est l'espèce pour laquelle les pétales ont la forme la plus étroite ?
 
 tapply(iris2$Rapport, iris2$Species, mean) 
 #ou
@@ -76,7 +76,7 @@ Rapport_m<-tapply(iris2$Rapport, iris2$Species, mean)
 names(Rapport_m[Rapport_m==max(Rapport_m)])
 
 
-#TDR6 - JEU DE DONNEES tvar
+# TDR6 - JEU DE DONNEES tvar
 
 # Import du jeu de données
 t3var <- read.table("t3var.txt", header = TRUE, sep = "\t", stringsAsFactors = TRUE)
